@@ -119,7 +119,7 @@ var LocalStorage = (function() {
 
 
 LocalStorage.config = {
-    driversPriority : ['DOM', 'IE', 'Flash'] /* Приоритет при выботе драйвера */
+    driversPriority : ['DOM', 'IE', 'Flash'] /* Приоритет при выборе драйвера */
 };
 
 /**
@@ -146,7 +146,7 @@ LocalStorage.Driver.prototype = {
      * @return {String}
      */
     stringify : function self(o) {
-        if (JSON && JSON.stringify) {
+        if (window.JSON && JSON.stringify) {
             return JSON.stringify(o);
         }
 
@@ -165,9 +165,8 @@ LocalStorage.Driver.prototype = {
         }
 
         /* Array */
+        var ret = [];
         if (type != 'function' && typeof(obj.length) == 'number') {
-            var ret = [];
-
             for (var i = 0; i < o.length; ++i) {
                 ret.push(self(o[i]));
             }
@@ -178,8 +177,6 @@ LocalStorage.Driver.prototype = {
         if (type == 'function') {
             throw new TypeError('Unable to convert object of type "function" to json.');
         }
-
-        var ret = [];
 
         for (var k in o) if (o.hasOwnProperty(k)) {
             ret.push('"' + k + '"' + ':' + self(o[k]));
