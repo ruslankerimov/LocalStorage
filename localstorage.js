@@ -100,6 +100,9 @@ var LocalStorage = (function() {
      * Публичные методы и свойства, прокидываем приватные методы
      */
     self.init  = init;
+    self.driver = function() {
+        return driver;
+    };
     self.check = function() {
         return check;
     };
@@ -150,10 +153,9 @@ LocalStorage.Driver.prototype = {
      * @return {String}
      */
     stringify : function self(o) {
-        if (window.JSON && JSON.stringify) {
-            return JSON.stringify(o);
-        }
-
+//        if (window.JSON && JSON.stringify) {
+//            return JSON.stringify(o);
+//        }
         var type = typeof(o);
 
         if (type == 'undefined') {
@@ -170,9 +172,9 @@ LocalStorage.Driver.prototype = {
 
         /* Array */
         var ret = [];
-        if (type != 'function' && typeof(obj.length) == 'number') {
+        if (type != 'function' && typeof(o.length) == 'number') {
             for (var i = 0; i < o.length; ++i) {
-                ret.push(self(o[i]));
+                ret.push(self.call(this, o[i]));
             }
 
             return '[' + ret.join(',') + ']';
@@ -183,7 +185,7 @@ LocalStorage.Driver.prototype = {
         }
 
         for (var k in o) if (o.hasOwnProperty(k)) {
-            ret.push('"' + k + '"' + ':' + self(o[k]));
+            ret.push('"' + k + '"' + ':' + self.call(this, o[k]));
         }
 
         return '{' + ret.join(',') + '}';
@@ -250,5 +252,3 @@ LocalStorage.Driver.prototype = {
 };
 
 LocalStorage.drivers = {};
-
-LocalStorage.init(); /* Инициализацию можно вынести и в другое место */

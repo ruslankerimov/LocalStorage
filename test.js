@@ -24,47 +24,47 @@ for (var i in LocalStorage.drivers) {
     })();
 }
 
-QUnit.module('LocalStorage');
-QUnit.test('Инициализации библиотеки', function() {
-    QUnit.raises(LocalStorage.init(), 'прошло без исключений');
+module('LocalStorage');
+test('Инициализации библиотеки', function() {
+    raises(LocalStorage.init(), 'прошло без исключений');
 });
-QUnit.test('Доступность стораджа', function() {
-    LocalStorage.init();
-    QUnit.ok(LocalStorage.check(), 'стордж доступен');
+LocalStorage.init();
+test('Доступность стораджа', function() {
+    ok(LocalStorage.check(), 'стордж доступен');
 });
 
-if (LocalStorage.init()) {
-    QUnit.test('Проверка записи LocalStorage::data', function() {
+if (LocalStorage.check()) {
+    test('Проверка записи LocalStorage::data', function() {
         LocalStorage.init();
-        LocalStorage.driver.removeAll();
+        LocalStorage.driver().removeAll();
 
         for (var i = 0; i < cases.length; ++i) {
-            QUnit.raises(
-                driver.set(cases[i][0], cases[i][1]),
+            raises(
+                LocalStorage.data(cases[i][0], cases[i][1]),
                 'прошло без исключений key: ' + cases[i][0] + ', value: ' + cases[i][1]
             );
         }
     });
 
-    QUnit.test('Проверка чтения driver::get', function() {
+    test('Проверка чтения driver::get', function() {
         LocalStorage.init();
-        LocalStorage.driver.removeAll();
+        LocalStorage.driver().removeAll();
 
         for (var i = 0; i < cases.length; ++i) {
-            driver.set(cases[i][0], cases[i][1]);
+            LocalStorage.data(cases[i][0], cases[i][1]);
         }
 
         for (var i = 0; i < cases.length; ++i) {
-            var value = driver.get(cases[i][0]);
+            var value = LocalStorage.data(cases[i][0]);
 
-            QUnit.deepEqual(
+            deepEqual(
                 value,
                 cases[i][1],
                 'должно быть верно'
             );
             if (cases[i].length > 2) {
                 for (var j = 2; j < cases[i].length; ++j) {
-                    QUnit.notDeepEqual(
+                    notDeepEqual(
                         value,
                         cases[i][j],
                         'должно быть не верно'
@@ -75,31 +75,29 @@ if (LocalStorage.init()) {
     });
 }
 
-
-
 function goTests(driver) {
-    QUnit.test('Инициализации драйвера', function() {
-        QUnit.raises(driver.init(), 'прошло без исключений');
+    test('Инициализации драйвера', function() {
+        raises(driver.init(), 'прошло без исключений');
     });
 
-    QUnit.test('Удаление всех ключей', function() {
+    test('Удаление всех ключей', function() {
         driver.init();
-        QUnit.raises(driver.removeAll(), 'прошло без исключений');
+        raises(driver.removeAll(), 'прошло без исключений');
     });
 
-    QUnit.test('Проверка записи driver::set', function() {
+    test('Проверка записи driver::set', function() {
         driver.init();
         driver.removeAll();
 
         for (var i = 0; i < cases.length; ++i) {
-            QUnit.raises(
+            raises(
                 driver.set(cases[i][0], cases[i][1]),
                 'прошло без исключений key: ' + cases[i][0] + ', value: ' + cases[i][1]
             );
         }
     });
 
-    QUnit.test('Проверка чтения driver::get', function() {
+    test('Проверка чтения driver::get', function() {
         driver.init();
         driver.removeAll();
 
@@ -110,14 +108,14 @@ function goTests(driver) {
         for (var i = 0; i < cases.length; ++i) {
             var value = driver.get(cases[i][0]);
 
-            QUnit.deepEqual(
+            deepEqual(
                 value,
                 cases[i][1],
                 'должно быть верно'
             );
             if (cases[i].length > 2) {
                 for (var j = 2; j < cases[i].length; ++j) {
-                    QUnit.notDeepEqual(
+                    notDeepEqual(
                         value,
                         cases[i][j],
                         'должно быть не верно'
@@ -127,7 +125,7 @@ function goTests(driver) {
         }
     });
 
-    QUnit.test('Проверка удаления driver::remove', function() {
+    test('Проверка удаления driver::remove', function() {
         driver.init();
         driver.removeAll();
 
@@ -138,7 +136,7 @@ function goTests(driver) {
         for (var i = 0; i < cases.length; ++i) {
             driver.remove(cases[i][0]);
 
-            QUnit.strictEqual(
+            strictEqual(
                 driver.get(cases[i][0]),
                 undefined,
                 'должно быть undefined'
@@ -146,7 +144,7 @@ function goTests(driver) {
         }
     });
 
-    QUnit.test('Проверка удаления всего driver::removeAll', function() {
+    test('Проверка удаления всего driver::removeAll', function() {
         driver.init();
         driver.removeAll();
         
@@ -156,7 +154,7 @@ function goTests(driver) {
 
         driver.removeAll();
         for (var i = 0; i < cases.length; ++i) {
-            QUnit.strictEqual(
+            strictEqual(
                 driver.get(cases[i][0]),
                 undefined,
                 'должно быть undefined'
