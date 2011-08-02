@@ -35,6 +35,7 @@ var LocalStorage = (function() {
      * @return  в случае, если ключ не был задан возвращает undefined
      */
     function get(key) {
+        key = LocalStorage.config.namespace + '_' + key;
         var ret = driver.get(key);
 
         if ( ! ret) {
@@ -62,7 +63,7 @@ var LocalStorage = (function() {
      */
     function set(key, value, period) {
         period = parseInt(period || 0);
-        key += '';
+        key = LocalStorage.config.namespace + '_' + key;
 
         var now = (new Date).getTime();
 
@@ -87,8 +88,10 @@ var LocalStorage = (function() {
         for (var i = 0; i < list.length; ++i) {
             var item = list[i];
 
-            if (item.value && item.value.expires && now > item.value.expires) {
-                driver.remove(item.key);
+            if (item.key.indexOf(LocalStorage.config.namespace + '_') == 0
+                && item.value && item.value.expires
+                && now > item.value.expires) {
+                    driver.remove(item.key);
             }
         }
     }
@@ -119,7 +122,8 @@ var LocalStorage = (function() {
 
 
 LocalStorage.config = {
-    driversPriority : ['DOM', 'IE', 'Flash'] /* Приоритет при выборе драйвера */
+    driversPriority : ['DOM', 'IE', 'Flash'], /* Приоритет при выборе драйвера */
+    namespace       : 'ls'                    /* Namespace дла ключей */
 };
 
 /**
@@ -246,3 +250,5 @@ LocalStorage.Driver.prototype = {
 };
 
 LocalStorage.drivers = {};
+
+LocalStorage.init(); /* Инициализацию можно вынести и в другое место */
