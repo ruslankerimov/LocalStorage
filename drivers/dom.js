@@ -4,6 +4,10 @@
 LocalStorage.drivers['DOM_driver'] = {
     _storage : null,
 
+    _inited : false,
+
+    _isFF   : false,
+    
     type : 'DOM',
 
     /**
@@ -19,8 +23,18 @@ LocalStorage.drivers['DOM_driver'] = {
      * Инициализяция драйвера
      */
     init : function() {
-        this._storage = window.localStorage
-            || (window.globalStorage && window.globalStorage[document.domain] /* для FF lt 4 */);
+        if ( ! this.check()) {
+            return;
+        }
+
+        if (window.localStorage) {
+            this._storage = window.localStorage
+        } else if (window.globalStorage) {
+            this._storage = window.globalStorage[document.domain]; /* для FF lt 4 */
+            this._isFF = true;
+        }
+        
+        this._inited = true;
     },
 
     /**
@@ -30,7 +44,12 @@ LocalStorage.drivers['DOM_driver'] = {
      */
     get : function(key) {
         key += '';
-        return this.parseJSON(this._storage[key]);
+        var ret = this._storage[key];
+        
+        if (ret === null) {
+            ret = undefined;
+        }
+        return this.parseJSON(ret);
     },
 
     /**
@@ -62,7 +81,7 @@ LocalStorage.drivers['DOM_driver'] = {
         for (var key in this._storage) if (this._storage.hasOwnProperty(key)) {
             ret.push({
                 key   : key,
-                value : this.parseJSON(this._storage[key])
+                value : this.get(key)
             });
         }
         return ret;

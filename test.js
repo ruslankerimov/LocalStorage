@@ -1,5 +1,5 @@
 var cases = [
-    [0, 'easy string'],
+    ['key0', 'easy string'],
     [null, 'easy string'],
     [undefined, 'easy string'],
     ['key1', 'easy string'],

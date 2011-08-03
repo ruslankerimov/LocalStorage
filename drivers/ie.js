@@ -4,6 +4,8 @@
 LocalStorage.drivers['IE_driver'] = {
     _storage : null,
 
+    _inited : false,
+    
     type : 'IE',
 
     check : function() {
@@ -11,6 +13,10 @@ LocalStorage.drivers['IE_driver'] = {
     },
 
     init : function() {
+        if ( ! this.check()) {
+            return;
+        }
+
         var elm = document.createElement('div');
 
         elm.style.display = 'none';
@@ -19,6 +25,7 @@ LocalStorage.drivers['IE_driver'] = {
         elm.addBehavior('#default#userData');
         elm.load('namespace');
         this._storage = elm;
+        this._inited = true;
     },
 
     get : function(key) {
