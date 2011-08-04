@@ -35,7 +35,11 @@ var LocalStorage = (function() {
      * @return  в случае, если ключ не был задан возвращает undefined
      */
     function get(key) {
+        if ( ! check) {
+            return undefined;
+        }
         key = LocalStorage.config.namespace + '_' + key;
+        
         var ret = driver.get(key);
 
         if ( ! ret) {
@@ -62,8 +66,11 @@ var LocalStorage = (function() {
      * @return {Boolean} возвращает успешность записи
      */
     function set(key, value, period) {
+        if ( ! check) {
+            return false;
+        }
         period = parseInt(period || 0);
-        key = LocalStorage.config.namespace + '_' + key;
+        key = LocalStorage.config.namespace + key;
 
         var now = (new Date).getTime();
 
@@ -126,7 +133,7 @@ var LocalStorage = (function() {
 
 LocalStorage.config = {
     driversPriority : ['DOM', 'IE', 'Flash'], /* Приоритет при выборе драйвера */
-    namespace       : 'ls'                    /* Namespace дла ключей */
+    namespace       : 'ls_'                   /* Namespace дла ключей */
 };
 
 /**
