@@ -7,14 +7,15 @@ var LocalStorage = (function() {
         check  = false;     /* Флаг доступности */
 
     function init() {
-        var driverType;
+        var driverType,
+            driversPriority = LocalStorage.config.driversPriority;
 
         /* Обходим драйвера в определённом порядке и находим первый подходящий */
-        for (var i = 0; i < LocalStorage.config.driversPriority.length; ++i) {
-            var driverName = LocalStorage.config.driversPriority[i] + '_driver';
+        for (var i = 0; i < driversPriority.length; ++i) {
+            var driverName = driversPriority[i] + '_driver';
 
-            if (LocalStorage.drivers[driverName].check()) {
-                driverType = LocalStorage.config.driversPriority[i];
+            if (LocalStorage.drivers[driverName] && LocalStorage.drivers[driverName].check()) {
+                driverType = driversPriority[i];
                 break;
             }
         }
@@ -38,7 +39,7 @@ var LocalStorage = (function() {
         if ( ! check) {
             return undefined;
         }
-        key = LocalStorage.config.namespace + '_' + key;
+        key = LocalStorage.config.namespace + key;
         
         var ret = driver.get(key);
 
@@ -77,8 +78,23 @@ var LocalStorage = (function() {
         try {
             driver.set(key, {
                 value   : value,
-                expires : now + period * 1000
+                expires : period == 0 ? 0 : (now + period * 1000)
             });
+        } catch (e) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Удаляем ключ
+     * @param {String} key
+     * @return {Boolean} возвращает успешность удаления
+     */
+    function remove(key) {
+        key = LocalStorage.config.namespace + key;
+        try {
+            driver.remove(key);
         } catch (e) {
             return false;
         }
@@ -95,7 +111,7 @@ var LocalStorage = (function() {
         for (var i = 0; i < list.length; ++i) {
             var item = list[i];
 
-            if (item.key.indexOf(LocalStorage.config.namespace + '_') == 0
+            if (item.key.indexOf(LocalStorage.config.namespace) == 0
                 && item.value && item.value.expires
                 && now > item.value.expires) {
                     driver.remove(item.key);
@@ -115,13 +131,17 @@ var LocalStorage = (function() {
     };
 
     /**
-     * Универсальный метод: геттер и сеттер
+     * Универсальный метод: читает, записывает и удаляет;
      */
     self.data = function () {
         var args = Array.prototype.slice.call(arguments);
 
         if (args.length > 1) {
-            return set.apply(self, args);
+            if (args[1] === undefined) {
+                return remove.apply(self, args);
+            } else {
+                return set.apply(self, args);
+            }
         } else if (args.length == 1) {
             return get.apply(self, args);
         }
@@ -132,8 +152,8 @@ var LocalStorage = (function() {
 
 
 LocalStorage.config = {
-    driversPriority : ['DOM', 'IE', 'Flash'], /* Приоритет при выборе драйвера */
-    namespace       : 'ls_'                   /* Namespace дла ключей */
+    driversPriority : ['DOM', 'FF', 'IE', 'Flash'], /* Приоритет при выборе драйвера */
+    namespace       : 'ls_'                         /* Namespace дла ключей */
 };
 
 /**

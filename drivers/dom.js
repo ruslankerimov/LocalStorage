@@ -6,8 +6,6 @@ LocalStorage.drivers['DOM_driver'] = {
 
     _inited : false,
 
-    _isFF   : false,
-    
     type : 'DOM',
 
     /**
@@ -15,8 +13,11 @@ LocalStorage.drivers['DOM_driver'] = {
      * @return {Boolean}
      */
     check : function() {
-        return !!(window.localStorage
-            || window.globalStorage /* для FF lt 4 */);
+        try {
+            return !!localStorage.getItem;
+        } catch(e) {
+            return false;
+        }
     },
 
     /**
@@ -27,13 +28,7 @@ LocalStorage.drivers['DOM_driver'] = {
             return;
         }
 
-        if (window.localStorage) {
-            this._storage = window.localStorage
-        } else if (window.globalStorage) {
-            this._storage = window.globalStorage[document.domain]; /* для FF lt 4 */
-            this._isFF = true;
-        }
-        
+        this._storage = window.localStorage;
         this._inited = true;
     },
 
@@ -44,7 +39,7 @@ LocalStorage.drivers['DOM_driver'] = {
      */
     get : function(key) {
         key += '';
-        var ret = this._storage[key];
+        var ret = this._storage.getItem(key);
         
         if (ret === null) {
             ret = undefined;
@@ -59,7 +54,7 @@ LocalStorage.drivers['DOM_driver'] = {
      */
     set : function(key, value) {
         key += '';
-        this._storage[key] = this.stringify(value);
+        this._storage.setItem(key, this.stringify(value));
     },
 
     /**
@@ -68,7 +63,7 @@ LocalStorage.drivers['DOM_driver'] = {
      */
     remove : function(key) {
         key += '';
-        delete this._storage[key];
+        this._storage.removeItem(key);
     },
 
     /**
@@ -78,12 +73,15 @@ LocalStorage.drivers['DOM_driver'] = {
     getAll : function() {
         var ret = [];
 
-        for (var key in this._storage) if (this._storage.hasOwnProperty(key)) {
+        for (var i = 0; i < this._storage.length; ++i) {
+            var key = this._storage.key(i);
+
             ret.push({
                 key   : key,
                 value : this.get(key)
-            });
+            })
         }
+
         return ret;
     },
 
@@ -91,8 +89,6 @@ LocalStorage.drivers['DOM_driver'] = {
      * Удаление всех ключей
      */
     removeAll : function() {
-        for (var key in this._storage) if (this._storage.hasOwnProperty(key)) {
-            delete this._storage[key];
-        }
+        this._storage.clear();
     }
 };

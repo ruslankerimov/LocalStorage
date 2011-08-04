@@ -46,7 +46,7 @@ if (LocalStorage.check()) {
         }
     });
 
-    test('Проверка чтения driver::get', function() {
+    test('Проверка чтения LocalStorage::data', function() {
         LocalStorage.init();
         LocalStorage.driver().removeAll();
 

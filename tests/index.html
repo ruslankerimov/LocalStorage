@@ -3,15 +3,26 @@
 <head>
     <meta content="text/html; charset=utf-8" http-equiv="content-type"/>
     <title>Local Storage Library</title>
-    <script src="LocalStorage.js"></script>
+    <script src="../localstorage.js"></script>
+    <script src="../drivers/ie.js"></script>
+    <script src="../drivers/dom.js"></script>
+    <script src="../drivers/flash.js"></script>
+    <script src="../drivers/ff.js"></script>
     <script>
+        LocalStorage.init();
+        alert(LocalStorage.driver().type);
         window.onload = function() {
             document.getElementById('get').onclick = function() {
                 var data = LocalStorage.data(document.getElementById('key').value);
                 alert(data);
             };
             document.getElementById('set').onclick = function() {
-                LocalStorage.data(document.getElementById('key').value, document.getElementById('value').value);
+                var ret = LocalStorage.data(document.getElementById('key').value, document.getElementById('value').value);
+                alert(ret);
+            };
+            document.getElementById('remove').onclick = function() {
+                var ret = LocalStorage.data(document.getElementById('key').value, undefined);
+                alert(ret);
             };
         }
     </script>
@@ -29,8 +40,10 @@
         <br/>
         <textarea id="value" name="value"></textarea>
         <br/>
+        <br/>
         <input id="set" type="button" value="записать"/>
         <input id="get" type="button" value="причитать"/>
+        <input id="remove" type="button" value="удалить"/>
     </form>
 </body>
 </html>
