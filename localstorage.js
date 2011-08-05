@@ -180,9 +180,9 @@ LocalStorage.Driver.prototype = {
      * @return {String}
      */
     stringify : function self(o) {
-//        if (window.JSON && JSON.stringify) {
-//            return JSON.stringify(o);
-//        }
+        if (window.JSON && JSON.stringify) {
+            return JSON.stringify(o);
+        }
         var type = typeof(o);
 
         if (type == 'undefined') {
